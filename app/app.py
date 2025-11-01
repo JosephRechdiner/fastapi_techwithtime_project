@@ -36,13 +36,15 @@ async def upload_file(
             temp_file_path = temp_file.name
             shutil.copyfileobj(file.file, temp_file)
 
-        upload_result = imagekit.upload_file(
-            file=open(temp_file_path, "rb"),
-            file_name=file.filename,
-            options=UploadFileRequestOptions(
-                use_unique_file_name=True,
-                tags=["backend-upload"]
-            )
+        with open(temp_file_path, "rb") as f:
+            upload_result = imagekit.upload_file(
+                file=f,
+                file_name=file.filename,
+                options=UploadFileRequestOptions(
+                    use_unique_file_name=True,
+                    tags=["backend-upload"]
+                )
+            
         )
         if upload_result.response_metadata.http_status_code == 200:
             post = Post(
@@ -57,7 +59,7 @@ async def upload_file(
             return post
 
     except Exception as e:
-        raise HTTPException(status_code=800, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e))
     finally:
         if temp_file_path and os.path.exists(temp_file_path):
             os.unlink(temp_file_path)
