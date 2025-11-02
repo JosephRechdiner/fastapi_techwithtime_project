@@ -31,8 +31,7 @@ async def upload_file(
     temp_file_path = None
 
     try:
-        with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1]) as temp_file:
-
+        with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1]) as temp_file:     
             temp_file_path = temp_file.name
             shutil.copyfileobj(file.file, temp_file)
 
@@ -43,9 +42,9 @@ async def upload_file(
                 options=UploadFileRequestOptions(
                     use_unique_file_name=True,
                     tags=["backend-upload"]
-                )
+                )          
+            )
             
-        )
         if upload_result.response_metadata.http_status_code == 200:
             post = Post(
                 caption=caption,
@@ -60,6 +59,7 @@ async def upload_file(
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
     finally:
         if temp_file_path and os.path.exists(temp_file_path):
             os.unlink(temp_file_path)
